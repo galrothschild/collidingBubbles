@@ -1,0 +1,25 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+canvas {
+    color: hsl(210, 80%, 34%);
+    cursor: grab;
+    background: linear-gradient(90deg, rgb(135, 203, 225), rgb(0, 118, 157));
+}
+
+.mouseBound {
+    cursor: grabbing;
+}
+
+#snowball {
+    display: none;
+}

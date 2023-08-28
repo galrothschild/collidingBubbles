@@ -4,7 +4,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let frame = 0;
-
+const minRadius = 50;
+const maxRadius = 100;
 
 function randomInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -63,22 +64,21 @@ const mouse = {
     y: undefined,
 };
 
-const maxRadius = 100;
 const gravity = 0;
 const terminalVelocity = 30;
 const friction = 0.001;
 
 const colorArray = [
-    "#001219ff",
-    "#005f73ff",
-    "#0a9396ff",
-    "#94d2bdff",
-    "#e9d8a6ff",
-    "#ee9b00ff",
-    "#ca6702ff",
-    "#bb3e03ff",
-    "#ae2012ff",
-    "#9b2226ff"
+    "#00121950",
+    "#005f7350",
+    "#0a939650",
+    "#94d2bd50",
+    "#e9d8a650",
+    "#ee9b0050",
+    "#ca670250",
+    "#bb3e0350",
+    "#ae201250",
+    "#9b222650"
 ];
 
 window.addEventListener("resize", () => {
@@ -94,6 +94,8 @@ window.addEventListener("click", () => {
     circles.forEach((circle) => {
         if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
             circle.bounded = true;
+            circle.velocity.x = 0;
+            circle.velocity.y = 0;
             canvas.classList.add("mouseBound");
         } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
             canvas.classList.remove("mouseBound");
@@ -118,12 +120,12 @@ function Circle(x, y, dx, dy, radius) {
     this.frameX = 0;
     this.frameY = 0;
     this.spriteWidth = 512;
-    this.spriteHeight = 385;
-    this.maxFrame = 5;
+    this.spriteHeight = 512;
+    this.maxFrame = 0;
     this.minFrame = 0;
     this.angle = Math.atan2(this.velocity.y, this.velocity.x);
 
-    const scaleFactor = Math.min((2 * 125) / this.spriteWidth, (2 * 125) / this.spriteHeight);
+    const scaleFactor = this.radius * 2.8 / this.spriteHeight;
     const adjustedSpriteWidth = this.spriteWidth * scaleFactor;
     const adjustedSpriteHeight = this.spriteHeight * scaleFactor;
     const drawY = this.y - adjustedSpriteHeight / 2;
@@ -139,16 +141,15 @@ function Circle(x, y, dx, dy, radius) {
         // ctx.stroke();
         ctx.fill();
         ctx.save();
-        ctx.translate(this.velocity.x < 0 ? this.x + 45 : this.x - 45, this.velocity.y < 0 ? this.y + 45 : this.y - 45);
-        ctx.rotate(this.angle + Math.PI);
+        ctx.translate(this.x + this.radius * 0.6, this.y - this.radius * 1.4);
         ctx.drawImage(
             this.img,
             this.frameX * this.spriteWidth,
             this.frameY * this.spriteHeight,
-            512,
-            385,
-            -adjustedSpriteWidth / 2,
-            -adjustedSpriteHeight / 2,
+            this.spriteWidth,
+            this.spriteHeight,
+            -this.radius * 2,
+            0,
             adjustedSpriteWidth,
             adjustedSpriteHeight
         );
@@ -231,8 +232,9 @@ function Circle(x, y, dx, dy, radius) {
 
 const circles = [];
 let init = () => {
-    for (let i = 0; i < 10; i++) {
-        let radius = 50;
+
+    for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
+        let radius = randomInRange(minRadius, maxRadius);
         let x = randomInRange(radius, innerWidth - radius);
         let y = randomInRange(radius, innerHeight - radius);
         if (i > 0) {

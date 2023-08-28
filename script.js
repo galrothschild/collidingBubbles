@@ -4,6 +4,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let frame = 0;
+let score = 0;
 const minRadius = 50;
 const maxRadius = 100;
 
@@ -81,6 +82,12 @@ const colorArray = [
     "#9b222650"
 ];
 
+const scoreSizeMap = new Map([[10, 50], [20, 25], [50, 10], [100, 3]]);
+
+function showScore(score) {
+    document.getElementById("score").innerText = score;
+}
+
 window.addEventListener("resize", () => {
     if (innerHeight !== canvas.height || innerWidth !== canvas.width) {
         location.reload();
@@ -93,10 +100,10 @@ window.addEventListener("click", () => {
 
     circles.forEach((circle) => {
         if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
-            circle.bounded = true;
-            circle.velocity.x = 0;
-            circle.velocity.y = 0;
-            canvas.classList.add("mouseBound");
+            circle.pop();
+            // circle.velocity.x = 0;
+            // circle.velocity.y = 0;
+            // canvas.classList.add("mouseBound");
         } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
             canvas.classList.remove("mouseBound");
             circle.bounded = false;
@@ -104,7 +111,7 @@ window.addEventListener("click", () => {
     });
 });
 function Circle(x, y, dx, dy, radius) {
-    this.img = document.getElementById("snowball");
+    this.img = document.getElementById("bubble");
     this.x = x;
     this.y = y;
     this.velocity = {
@@ -114,8 +121,8 @@ function Circle(x, y, dx, dy, radius) {
     this.radius = radius;
     this.minRadius = radius;
     this.mass = 1;
-    let color = colorArray[randomInRange(0, colorArray.length - 1)];
-
+    this.color = colorArray[randomInRange(0, colorArray.length - 1)];
+    this.lastFrame = 0;
     this.frame = 0;
     this.frameX = 0;
     this.frameY = 0;
@@ -124,18 +131,29 @@ function Circle(x, y, dx, dy, radius) {
     this.maxFrame = 0;
     this.minFrame = 0;
     this.angle = Math.atan2(this.velocity.y, this.velocity.x);
-
+    this.popped = false;
     const scaleFactor = this.radius * 2.8 / this.spriteHeight;
     const adjustedSpriteWidth = this.spriteWidth * scaleFactor;
     const adjustedSpriteHeight = this.spriteHeight * scaleFactor;
-    const drawY = this.y - adjustedSpriteHeight / 2;
 
     this.bounded = false;
 
 
+    this.pop = function () {
+        if (!this.popped) {
+            this.popped = true;
+            this.velocity = { x: 0, y: 0 };
+            this.maxFrame = 5;
+            this.lastFrame = frame + this.maxFrame * 3 + 1;
+            this.color = "#00000000";
+            score += scoreSizeMap.get(this.radius);
+            showScore(score);
+        }
+    };
+
     this.draw = function (circles) {
         ctx.beginPath();
-        ctx.fillStyle = color;
+        ctx.fillStyle = this.color;
         // ctx.strokeStyle = color;
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         // ctx.stroke();
@@ -158,28 +176,16 @@ function Circle(x, y, dx, dy, radius) {
     };
 
     this.update = function (circles) {
+        if (frame === this.lastFrame && this.lastFrame) {
+            let index = circles.indexOf(this);
+            circles.splice(index, 1);
+        }
         if ((this.y >= innerHeight - this.radius && this.velocity.y > 0) || (this.y <= this.radius && this.velocity.y < 0)) {
             this.velocity.y = -this.velocity.y * (1 - friction);
         }
         if ((this.x >= innerWidth - this.radius && this.velocity.x > 0) || (this.x <= this.radius && this.velocity.x < 0)) {
             this.velocity.x = -this.velocity.x * (1 - friction);
         }
-        // if (this.x > innerWidth - this.radius) {
-        //     this.x = innerWidth - this.radius + 1;
-        // }
-        // if (this.y > innerHeight - this.radius) {
-        //     this.y = innerHeight - this.radius + 1;
-        // }
-        // if (this.x < this.radius) {
-        //     this.x = this.radius + 1;
-        // }
-        // if (this.y < this.radius) {
-        //     this.y = this.radius + 1;
-        // }
-        // if (this.y > innerHeight) {
-        //     this.velocity.y = randomInRange(0, 9);
-        //     this.y = this.radius + 1;
-        // }
         if (this.velocity.y < terminalVelocity && this.y < innerHeight - this.radius) { this.velocity.y += gravity; }
         if (this.velocity.y > terminalVelocity) { this.velocity.y = terminalVelocity; }
         this.x += this.velocity.x;
@@ -219,7 +225,7 @@ function Circle(x, y, dx, dy, radius) {
         // }
 
         // animation
-        if (frame % 5 === 0) {
+        if (frame % this.maxFrame === 0) {
             this.frame = this.frame < this.maxFrame ? this.frame + 1 : this.minFrame;
             this.frameX = this.frame % 3;
             this.frameY = Math.floor(this.frame / 3);
@@ -234,7 +240,7 @@ const circles = [];
 let init = () => {
 
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
-        let radius = randomInRange(minRadius, maxRadius);
+        let radius = [...scoreSizeMap.keys()][randomInRange(0, 3)];
         let x = randomInRange(radius, innerWidth - radius);
         let y = randomInRange(radius, innerHeight - radius);
         if (i > 0) {

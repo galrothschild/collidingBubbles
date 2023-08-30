@@ -16,7 +16,7 @@ body {
 canvas {
     color: hsl(210, 80%, 34%);
 
-    background: linear-gradient(90deg, rgb(135, 203, 225), rgb(0, 118, 157));
+    background: linear-gradient(135deg, rgba(174, 0, 255, 0.644) 5%, rgb(0, 204, 255));
 }
 
 

@@ -7,7 +7,22 @@ let frame = 0;
 let score = 0;
 const minRadius = 50;
 const maxRadius = 100;
-
+let doAnimation = true;
+const gravity = 0;
+const terminalVelocity = 30;
+const friction = 0;
+const scoreSizeMap = new Map([[10, 50], [20, 25], [50, 10], [100, 3]]);
+const colorArray = [
+    "#f7258530",
+    "#7209b730",
+    "#3a0ca330",
+    "#4361ee30",
+    "#4cc9f030",
+];
+const mouse = {
+    x: undefined,
+    y: undefined,
+};
 function randomInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -60,33 +75,10 @@ function colide(circle, otherCircle) {
 
 }
 
-const mouse = {
-    x: undefined,
-    y: undefined,
-};
-
-const gravity = 0;
-const terminalVelocity = 30;
-const friction = 0.001;
-
-const colorArray = [
-    "#00121950",
-    "#005f7350",
-    "#0a939650",
-    "#94d2bd50",
-    "#e9d8a650",
-    "#ee9b0050",
-    "#ca670250",
-    "#bb3e0350",
-    "#ae201250",
-    "#9b222650"
-];
-
-const scoreSizeMap = new Map([[10, 50], [20, 25], [50, 10], [100, 3]]);
-
 function showScore(score) {
     document.getElementById("score").innerText = score;
 }
+
 
 window.addEventListener("resize", () => {
     if (innerHeight !== canvas.height || innerWidth !== canvas.width) {
@@ -101,9 +93,6 @@ window.addEventListener("click", () => {
     circles.forEach((circle) => {
         if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
             circle.pop();
-            // circle.velocity.x = 0;
-            // circle.velocity.y = 0;
-            // canvas.classList.add("mouseBound");
         } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
             canvas.classList.remove("mouseBound");
             circle.bounded = false;
@@ -154,9 +143,7 @@ function Circle(x, y, dx, dy, radius) {
     this.draw = function (circles) {
         ctx.beginPath();
         ctx.fillStyle = this.color;
-        // ctx.strokeStyle = color;
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-        // ctx.stroke();
         ctx.fill();
         ctx.save();
         ctx.translate(this.x + this.radius * 0.6, this.y - this.radius * 1.4);
@@ -176,9 +163,10 @@ function Circle(x, y, dx, dy, radius) {
     };
 
     this.update = function (circles) {
-        if (frame === this.lastFrame && this.lastFrame) {
+        if (frame >= this.lastFrame && this.lastFrame) {
             let index = circles.indexOf(this);
             circles.splice(index, 1);
+            createBubble(circles);
         }
         if ((this.y >= innerHeight - this.radius && this.velocity.y > 0) || (this.y <= this.radius && this.velocity.y < 0)) {
             this.velocity.y = -this.velocity.y * (1 - friction);
@@ -213,17 +201,6 @@ function Circle(x, y, dx, dy, radius) {
                 colide(this, circles[i]);
             }
         }
-        // Interactivity
-
-        // if (mouse.x - this.x < maxRadius && mouse.x - this.x > -maxRadius
-        //     && mouse.y - this.y < maxRadius && mouse.y - this.y > -maxRadius && this.radius < maxRadius
-        // ) {
-        //     this.radius += 4;
-        // } else if (this.radius > this.minRadius && !(mouse.x - this.x < maxRadius && mouse.x - this.x > -maxRadius
-        //     && mouse.y - this.y < maxRadius && mouse.y - this.y > -maxRadius)) {
-        //     this.radius -= 1;
-        // }
-
         // animation
         if (frame % this.maxFrame === 0) {
             this.frame = this.frame < this.maxFrame ? this.frame + 1 : this.minFrame;
@@ -235,32 +212,37 @@ function Circle(x, y, dx, dy, radius) {
         this.draw();
     };
 }
+function createBubble(circles) {
+    let radius = [...scoreSizeMap.keys()][randomInRange(0, 3)];
+    let x = randomInRange(radius, innerWidth - radius);
+    let y = randomInRange(radius, innerHeight - radius);
+    if (circles.length > 0) {
+        for (let j = 0; j < circles.length; j++) {
+            if (distance(x, y, circles[j].x, circles[j].y) < radius + circles[j].radius) {
+                x = randomInRange(radius, innerWidth - radius);
+                y = randomInRange(radius, innerHeight - radius);
+                j--;
+            }
+        }
+    }
 
+    circles.push(new Circle(x, y, positiveNegative() * 2, positiveNegative() * 2, radius));
+}
 const circles = [];
 let init = () => {
 
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
-        let radius = [...scoreSizeMap.keys()][randomInRange(0, 3)];
-        let x = randomInRange(radius, innerWidth - radius);
-        let y = randomInRange(radius, innerHeight - radius);
-        if (i > 0) {
-            for (let j = 0; j < circles.length; j++) {
-                if (distance(x, y, circles[j].x, circles[j].y) < radius + circles[j].radius) {
-                    x = randomInRange(radius, innerWidth - radius);
-                    y = randomInRange(radius, innerHeight - radius);
-                    j = -1;
-                }
-            }
-        }
-
-        circles.push(new Circle(x, y, positiveNegative() * 2, positiveNegative() * 2, radius));
+        createBubble(circles);
     }
 };
 init();
 let animate = function () {
     requestAnimationFrame(animate);
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    circles.forEach(circle => (circle.update(circles)));
-    frame++;
+    if (doAnimation) {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        circles.forEach(circle => (circle.update(circles)));
+        frame++;
+    }
+
 };
 animate();

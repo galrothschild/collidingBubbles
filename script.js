@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let gameRunning = false;
 let frame = 0;
 let score = 0;
 const minRadius = 50;
@@ -23,6 +24,7 @@ const mouse = {
     x: undefined,
     y: undefined,
 };
+const circles = [];
 function randomInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -89,15 +91,16 @@ window.addEventListener("mousemove", (event) => {
     [mouse.x, mouse.y] = [event.x, event.y];
 });
 window.addEventListener("click", () => {
-
-    circles.forEach((circle) => {
-        if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
-            circle.pop();
-        } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
-            canvas.classList.remove("mouseBound");
-            circle.bounded = false;
-        }
-    });
+    if (gameRunning) {
+        circles.forEach((circle) => {
+            if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
+                circle.pop();
+            } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
+                canvas.classList.remove("mouseBound");
+                circle.bounded = false;
+            }
+        });
+    }
 });
 function Circle(x, y, dx, dy, radius) {
     this.img = document.getElementById("bubble");
@@ -228,9 +231,10 @@ function createBubble(circles) {
 
     circles.push(new Circle(x, y, positiveNegative() * 2, positiveNegative() * 2, radius));
 }
-const circles = [];
 let init = () => {
-
+    circles.length = 0;
+    score = 0;
+    showScore(score);
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
         createBubble(circles);
     }

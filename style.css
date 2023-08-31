@@ -16,7 +16,7 @@ body {
 
 canvas {
     color: hsl(210, 80%, 34%);
-
+    touch-action: none;
     background: linear-gradient(135deg, rgba(174, 0, 255, 0.644) 5%, rgb(0, 204, 255));
 }
 
@@ -32,8 +32,8 @@ canvas {
     min-height: 100px;
     background: rgba(0, 0, 0, 0.4);
     border-radius: 30px;
-    top: 100px;
-    left: 100px;
+    top: 10%;
+    left: 5%;
     color: white;
     text-align: center;
     padding: 10px 0;
@@ -83,4 +83,14 @@ canvas {
 
 .game-controls>button:hover {
     filter: brightness(0.92);
+}
+
+@media screen and (width<660px) {
+    .game-controls>h1 {
+        font-size: 1.5rem;
+    }
+
+    .game-controls {
+        font-size: 1rem;
+    }
 }

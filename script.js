@@ -7,12 +7,12 @@ let gameRunning = false;
 let frame = 0;
 let score = 0;
 const minRadius = 50;
-const maxRadius = 100;
 let doAnimation = true;
 const gravity = 0;
 const terminalVelocity = 30;
 const friction = 0;
-const scoreSizeMap = new Map([[10, 50], [20, 25], [50, 10], [100, 3]]);
+let scoreSizeMap = setBubbleSizeMap();
+const maxRadius = Math.max(...scoreSizeMap.keys());
 const colorArray = [
     "#f7258530",
     "#7209b730",
@@ -28,7 +28,15 @@ const circles = [];
 function randomInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
+function setBubbleSizeMap() {
+    let scoreSizeMap;
+    if (canvas.width > 660) {
+        scoreSizeMap = new Map([[10, 50], [20, 25], [50, 10], [100, 3]]);
+    } else {
+        scoreSizeMap = new Map([[20, 50], [25, 25], [30, 10], [50, 3]]);
+    }
+    return scoreSizeMap;
+}
 function distance(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }

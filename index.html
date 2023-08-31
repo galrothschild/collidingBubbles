@@ -4,26 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Bubble game!</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <img src="./bubble_spritesheet.png" id="bubble">
-    <div class="score">
+    <div class="score" id="gameDiv">
         <h2>Timer</h2>
-        <div id="timer">0:00</div>
+        <div id="timer"></div>
         <h2>Score</h2>
         <div id="score"></div>
     </div>
-    <div class="game-controls">
+    <div class="game-controls" id="gameControls">
         <h1>Bubbles Game!
         </h1>
-        <div class="best-score">Best Score: <strong id="bestScore">Don't have
+        <div class="high-score">Best Score: <strong id="highScore">Don't have
                 one yet</strong>
         </div>
-        <button type="button" id="start">Start game!</button>
+        <button type="button" id="start" onclick="startGame()">Start
+            game!</button>
     </div>
     <canvas id="myCanvas"></canvas>
     <script src="script.js"></script>

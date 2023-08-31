@@ -231,15 +231,57 @@ function createBubble(circles) {
 
     circles.push(new Circle(x, y, positiveNegative() * 2, positiveNegative() * 2, radius));
 }
+
+function startTimer() {
+
+    const timer = document.getElementById("timer");
+    let gameTime = 20;
+    timer.innerText = `${(Math.floor(gameTime / 60)).toString().padStart(2, "0")}:${(gameTime % 60).toString().padStart(2, "0")}`;
+    let id = setInterval(() => {
+        if (gameTime === 0) {
+            endGame();
+            clearInterval(id);
+        } else {
+            timer.innerText = `${(Math.floor(gameTime / 60)).toString().padStart(2, "0")}:${(gameTime % 60).toString().padStart(2, "0")}`;
+            gameTime--;
+        }
+    }, 1000);
+
+}
+
+function saveScore(score) {
+    if (localStorage.getItem("highScore") === null) {
+        localStorage.setItem("highScore", score);
+    } else {
+        localStorage.setItem("highScore", +localStorage.getItem("highScore") > score ? +localStorage.getItem("highScore") : score);
+    }
+    showHighScore();
+}
+function showHighScore() {
+    document.getElementById("highScore").innerText = localStorage.getItem("highScore") ?? "Don't have one yet";
+}
+function endGame() {
+    gameRunning = false;
+    saveScore(score);
+    document.getElementById("gameDiv").style.display = "";
+    document.getElementById("gameControls").style.display = "";
+}
 let init = () => {
     circles.length = 0;
-    score = 0;
-    showScore(score);
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
         createBubble(circles);
     }
+    showHighScore();
 };
-init();
+function startGame() {
+    score = 0;
+    showScore(score);
+    document.getElementById("gameDiv").style.display = "block";
+    document.getElementById("gameControls").style.display = "none";
+    init();
+    startTimer();
+    gameRunning = true;
+}
 let animate = function () {
     requestAnimationFrame(animate);
     if (doAnimation) {
@@ -249,4 +291,5 @@ let animate = function () {
     }
 
 };
+init();
 animate();

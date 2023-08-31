@@ -37,6 +37,7 @@ canvas {
     color: white;
     text-align: center;
     padding: 10px 0;
+    display: none;
 }
 
 .score>div {
@@ -58,6 +59,7 @@ canvas {
     justify-content: space-between;
     padding: 20px 20px;
     border-radius: 20px;
+    font-size: 1.5rem;
 }
 
 .game-controls>h1 {

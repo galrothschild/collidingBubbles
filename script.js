@@ -89,7 +89,21 @@ function showScore(score) {
     document.getElementById("score").innerText = score;
 }
 
-
+[canvas, document.getElementById("gameDiv")].forEach(element => element.addEventListener('touchstart', function (event) {
+    event.preventDefault();
+    console.log(event);
+    [mouse.x, mouse.y] = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
+    if (gameRunning) {
+        circles.forEach((circle) => {
+            if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && !circle.bounded) {
+                circle.pop();
+            } else if (circle.x < mouse.x + circle.radius && circle.x > mouse.x - circle.radius && circle.y > mouse.y - circle.radius && circle.y < mouse.y + circle.radius && circle.bounded) {
+                canvas.classList.remove("mouseBound");
+                circle.bounded = false;
+            }
+        });
+    }
+}, false));
 window.addEventListener("resize", () => {
     if (innerHeight !== canvas.height || innerWidth !== canvas.width) {
         location.reload();
@@ -110,6 +124,7 @@ window.addEventListener("click", () => {
         });
     }
 });
+
 function Circle(x, y, dx, dy, radius) {
     this.img = document.getElementById("bubble");
     this.x = x;

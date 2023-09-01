@@ -4,6 +4,8 @@
     box-sizing: border-box;
     user-select: none;
     cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 html,
@@ -19,7 +21,7 @@ canvas {
     touch-action: none;
     background: linear-gradient(135deg, rgba(174, 0, 255, 0.644) 5%, rgb(0, 204, 255));
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-    tap-highlight-color: transparent;
+
 }
 
 

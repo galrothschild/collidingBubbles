@@ -91,7 +91,6 @@ function showScore(score) {
 
 [canvas, document.getElementById("gameDiv")].forEach(element => element.addEventListener('touchstart', function (event) {
     event.preventDefault();
-    console.log(event);
     [mouse.x, mouse.y] = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
     if (gameRunning) {
         circles.forEach((circle) => {

@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+// Define Canvas Size to fit screen
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -28,6 +29,7 @@ const circles = [];
 function randomInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
+// Set the buuble size to score map responsively
 function setBubbleSizeMap() {
     let scoreSizeMap;
     if (canvas.width > 660) {
@@ -37,14 +39,15 @@ function setBubbleSizeMap() {
     }
     return scoreSizeMap;
 }
+// Calculate the distance between two points
 function distance(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
-
+// return either 1 or -1 randomly
 function positiveNegative() {
     return Math.random() < 0.5 ? 1 : -1;
 }
-
+// Rotate the POV for collision handling
 function rotate(velocity, angle) {
     const rotatedVelocities = {
         x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
@@ -52,7 +55,7 @@ function rotate(velocity, angle) {
     };
     return rotatedVelocities;
 }
-
+// Collision handling
 function colide(circle, otherCircle) {
     const xVelocityDifference = circle.velocity.x - otherCircle.velocity.x;
     const yVelocityDifference = circle.velocity.y - otherCircle.velocity.y;
@@ -85,10 +88,11 @@ function colide(circle, otherCircle) {
 
 }
 
+// Display the current score in the score div
 function showScore(score) {
     document.getElementById("score").innerText = score;
 }
-
+// handle touch events so it won't highlight the whole screen
 [canvas, document.getElementById("gameDiv")].forEach(element => element.addEventListener('touchstart', function (event) {
     event.preventDefault();
     [mouse.x, mouse.y] = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
@@ -103,14 +107,17 @@ function showScore(score) {
         });
     }
 }, false));
+// resize event handler
 window.addEventListener("resize", () => {
     if (innerHeight !== canvas.height || innerWidth !== canvas.width) {
         location.reload();
     }
 });
+// Mouse move event handler
 window.addEventListener("mousemove", (event) => {
     [mouse.x, mouse.y] = [event.x, event.y];
 });
+// Click event handler
 window.addEventListener("click", () => {
     if (gameRunning) {
         circles.forEach((circle) => {
@@ -123,7 +130,7 @@ window.addEventListener("click", () => {
         });
     }
 });
-
+// Circle Constructor
 function Circle(x, y, dx, dy, radius) {
     this.img = document.getElementById("bubble");
     this.x = x;
@@ -152,7 +159,7 @@ function Circle(x, y, dx, dy, radius) {
 
     this.bounded = false;
 
-
+    // Pop handling
     this.pop = function () {
         if (!this.popped) {
             this.popped = true;
@@ -164,7 +171,7 @@ function Circle(x, y, dx, dy, radius) {
             showScore(score);
         }
     };
-
+    // Drawing the bubble
     this.draw = function (circles) {
         ctx.beginPath();
         ctx.fillStyle = this.color;
@@ -186,7 +193,7 @@ function Circle(x, y, dx, dy, radius) {
         ctx.restore();
 
     };
-
+    // Handling the animation
     this.update = function (circles) {
         if (frame >= this.lastFrame && this.lastFrame) {
             let index = circles.indexOf(this);
@@ -237,6 +244,7 @@ function Circle(x, y, dx, dy, radius) {
         this.draw();
     };
 }
+// Create a bubble
 function createBubble(circles) {
     let radius = [...scoreSizeMap.keys()][randomInRange(0, 3)];
     let x = randomInRange(radius, innerWidth - radius);
@@ -253,7 +261,7 @@ function createBubble(circles) {
 
     circles.push(new Circle(x, y, positiveNegative() * 2, positiveNegative() * 2, radius));
 }
-
+// Game timer
 function startTimer() {
 
     const timer = document.getElementById("timer");
@@ -270,7 +278,7 @@ function startTimer() {
     }, 1000);
 
 }
-
+// Save score to local storage
 function saveScore(score) {
     if (localStorage.getItem("highScore") === null) {
         localStorage.setItem("highScore", score);
@@ -279,15 +287,18 @@ function saveScore(score) {
     }
     showHighScore();
 }
+// Show high score
 function showHighScore() {
     document.getElementById("highScore").innerText = localStorage.getItem("highScore") ?? "Don't have one yet";
 }
+// Finish the game when timer is over
 function endGame() {
     gameRunning = false;
     saveScore(score);
     document.getElementById("gameDiv").style.display = "";
     document.getElementById("gameControls").style.display = "";
 }
+// Initiate the screen with bubbles
 let init = () => {
     circles.length = 0;
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
@@ -295,6 +306,7 @@ let init = () => {
     }
     showHighScore();
 };
+// Start the game
 function startGame() {
     score = 0;
     showScore(score);
@@ -304,6 +316,7 @@ function startGame() {
     startTimer();
     gameRunning = true;
 }
+// Animate the canvas
 let animate = function () {
     requestAnimationFrame(animate);
     if (doAnimation) {

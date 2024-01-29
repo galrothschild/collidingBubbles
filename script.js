@@ -172,7 +172,7 @@ function Circle(x, y, dx, dy, radius) {
         }
     };
     // Drawing the bubble
-    this.draw = function (circles) {
+    this.draw = function () {
         ctx.beginPath();
         ctx.fillStyle = this.color;
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
@@ -194,7 +194,7 @@ function Circle(x, y, dx, dy, radius) {
 
     };
     // Handling the animation
-    this.update = function (circles) {
+    this.update = function () {
         if (frame >= this.lastFrame && this.lastFrame) {
             let index = circles.indexOf(this);
             circles.splice(index, 1);
@@ -245,7 +245,7 @@ function Circle(x, y, dx, dy, radius) {
     };
 }
 // Create a bubble
-function createBubble(circles) {
+function createBubble() {
     let radius = [...scoreSizeMap.keys()][randomInRange(0, 3)];
     let x = randomInRange(radius, innerWidth - radius);
     let y = randomInRange(radius, innerHeight - radius);
@@ -302,7 +302,7 @@ function endGame() {
 let init = () => {
     circles.length = 0;
     for (let i = 0; i < (Math.floor(canvas.width / (maxRadius * 2)) * Math.floor(canvas.height / (maxRadius * 2))); i++) {
-        createBubble(circles);
+        createBubble();
     }
     showHighScore();
 };
@@ -321,7 +321,7 @@ let animate = function () {
     requestAnimationFrame(animate);
     if (doAnimation) {
         ctx.clearRect(0, 0, innerWidth, innerHeight);
-        circles.forEach(circle => (circle.update(circles)));
+        circles.forEach(circle => (circle.update()));
         frame++;
     }
 
